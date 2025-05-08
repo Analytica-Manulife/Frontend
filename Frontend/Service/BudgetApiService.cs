@@ -1,3 +1,4 @@
+using System.Text.Json;
 using BudgetService.Data;
 using BudgetService.Properties.Data;
 
@@ -44,7 +45,22 @@ public class BudgetApiService
 
     public async Task<bool> CreateBudgetAsync(string accountId, Budget budget)
     {
+        var json = JsonSerializer.Serialize(budget, new JsonSerializerOptions
+        {
+            WriteIndented = true // Optional, makes it easier to read
+        });
+
+        Console.WriteLine("Request URL:");
+        Console.WriteLine($"{_baseUrl}/budget/Budget/{accountId}/create");
+
+        Console.WriteLine("JSON Body:");
+        Console.WriteLine(json);
+
         var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/budget/Budget/{accountId}/create", budget);
+
+        Console.WriteLine("Response:");
+        Console.WriteLine(response.ToString());
+
         return response.IsSuccessStatusCode;
     }
 
@@ -53,6 +69,7 @@ public class BudgetApiService
         Console.WriteLine("called with account id"+ accountId);
         var result = await _httpClient.GetAsync($"{_baseUrl}/transection/Transaction/{accountId}");
         Console.WriteLine(result.ToString());
+        
         Console.WriteLine($"{_baseUrl}/transection/Transaction/{accountId}");
         if (!result.IsSuccessStatusCode) return new List<Transaction>();
         return await result.Content.ReadFromJsonAsync<List<Transaction>>() ?? new List<Transaction>();

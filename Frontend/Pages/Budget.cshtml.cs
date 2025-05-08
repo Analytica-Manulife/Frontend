@@ -46,6 +46,7 @@ public class BudgetModel : PageModel
             MedicalExpense = medicalExpense
         };
         GeneratedBudget = await _api.GenerateBudgetAsync(accountId, request);
+        Budget = await _api.GetBudgetAsync(accountId); 
         Transactions = await _api.GetTransactionsAsync(accountId);
         return Page();
     }
@@ -66,6 +67,8 @@ public class BudgetModel : PageModel
 
         await _api.CreateTransactionAsync(accountId, txn);
         Transactions = await _api.GetTransactionsAsync(accountId);
+        Budget = await _api.GetBudgetAsync(accountId); 
+
         return Page();
     }
 
@@ -76,8 +79,9 @@ public class BudgetModel : PageModel
     {
         var accountId = _httpContextAccessor.HttpContext?.Session.GetString("AccountId");
 
-        var customBudget = new Budget
+        Budget customBudget = new Budget
         {
+            BudgetId = Guid.NewGuid(), // Add this line
             AccountId = Guid.Parse(accountId),
             PeriodStart = periodStart,
             PeriodEnd = periodEnd,
@@ -92,6 +96,19 @@ public class BudgetModel : PageModel
             SavingsGoal = SavingsGoal,
             TravelBudget = Travel
         };
+        Console.WriteLine("Custom Budget Details:");
+        Console.WriteLine($"AccountId: {customBudget.AccountId}");
+        Console.WriteLine($"Period: {customBudget.PeriodStart:yyyy-MM-dd} to {customBudget.PeriodEnd:yyyy-MM-dd}");
+        Console.WriteLine($"Entertainment: {customBudget.EntertainmentBudget}");
+        Console.WriteLine($"Education: {customBudget.EducationBudget}");
+        Console.WriteLine($"Investment: {customBudget.InvestmentBudget}");
+        Console.WriteLine($"Daily Needs: {customBudget.DailyNeedsBudget}");
+        Console.WriteLine($"Housing: {customBudget.HousingBudget}");
+        Console.WriteLine($"Utilities: {customBudget.UtilitiesBudget}");
+        Console.WriteLine($"Transportation: {customBudget.TransportationBudget}");
+        Console.WriteLine($"Healthcare: {customBudget.HealthcareBudget}");
+        Console.WriteLine($"Savings Goal: {customBudget.SavingsGoal}");
+        Console.WriteLine($"Travel: {customBudget.TravelBudget}");
 
         await _api.CreateBudgetAsync(accountId, customBudget);
         Budget = await _api.GetBudgetAsync(accountId);
