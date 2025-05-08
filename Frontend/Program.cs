@@ -7,6 +7,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<NewsService>();
 builder.Services.AddSingleton<StockService>();
+builder.Services.AddSingleton<PortfolioService>();
+builder.Services.AddSingleton<BudgetApiService>();
+
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<YahooFinanceService>();
 

@@ -1,0 +1,683 @@
+@page
+@using System.Text.Json
+@model BudgetModel
+
+@{
+    ViewData["Title"] = "Finance News";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Management Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0a6e31;
+            --secondary-color: #198754;
+            --light-bg: #f8f9fa;
+            --dark-text: #212529;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color) !important;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            font-weight: 600;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .budget-category {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .budget-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #085526;
+            border-color: #085526;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .transaction-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+        }
+        
+        .transaction-date {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .positive {
+            color: #198754;
+        }
+        
+        .negative {
+            color: #dc3545;
+        }
+        
+        .summary-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .summary-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+        }
+        
+        #accountIdDisplay {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-chart-pie me-2"></i>Budget Service
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#budget">Budget</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#transactions">Transactions</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center ms-3">
+                <span class="me-2">Account ID:</span>
+                <span id="accountIdDisplay">Not Set</span>
+                <button class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#accountModal">
+                    Change
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container mt-4">
+    <!-- Account ID Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Set Account ID</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="accountId" class="form-label">Account ID</label>
+                        <input type="text" class="form-control" id="accountId" placeholder="Enter your account ID">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveAccountId">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert for messages -->
+    <div id="alertContainer"></div>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="mb-5">
+        <h2 class="mb-4">Budget Dashboard</h2>
+            
+        <div class="row">
+            <!-- Budget Summary Cards -->
+            @* <div class="row mt-4"> *@
+            @*     <!-- Budget Summary Cards --> *@
+            @*     <div class="col-md-4"> *@
+            @*         <div class="card summary-card p-3"> *@
+            @*             <div class="summary-label">Total Budget</div> *@
+            @*             <div class="summary-value text-success" id="totalBudget"> *@
+            @*                 $@(Model.Budget?.TotalAmount.ToString("F2") ?? "0.00") *@
+            @*             </div> *@
+            @*             <div class="text-muted">Current period</div> *@
+            @*         </div> *@
+            @*     </div> *@
+            @* *@
+            @*     <div class="col-md-4"> *@
+            @*         <div class="card summary-card p-3"> *@
+            @*             <div class="summary-label">Spent So Far</div> *@
+            @*             <div class="summary-value text-danger" id="spentSoFar"> *@
+            @*                 $@(Model.Transactions?.Sum(t => t.Amount).ToString("F2") ?? "0.00") *@
+            @*             </div> *@
+            @*             <div class="text-muted">From transactions</div> *@
+            @*         </div> *@
+            @*     </div> *@
+            @* *@
+            @*     <div class="col-md-4"> *@
+            @*         <div class="card summary-card p-3"> *@
+            @*             <div class="summary-label">Remaining</div> *@
+            @*             <div class="summary-value text-primary" id="remainingBudget"> *@
+            @*                 @{ *@
+            @*                     var total = Model.Budget?.TotalAmount ?? 0; *@
+            @*                     var spent = Model.Transactions?.Sum(t => t.Amount) ?? 0; *@
+            @*                     var remaining = total - spent; *@
+            @*                 } *@
+            @*                 $@remaining.ToString("F2") *@
+            @*             </div> *@
+            @*             <div class="text-muted">Available to spend</div> *@
+            @*         </div> *@
+            @*     </div> *@
+            @* </div> *@
+
+        </div>
+
+        <div class="row mt-4">
+            <!-- Budget Distribution Chart -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Budget Distribution</span>
+                        <div class="spinner-border spinner-border-sm text-primary loading-spinner" id="chartLoading" role="status">
+                          @if (Model.Budget != null)
+{
+    <div class="card mt-4">
+        <div class="card-header">Budget Chart</div>
+        <div class="card-body">
+            <canvas id="budgetChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <script>
+        
+    </script>
+}
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="budgetDistributionChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+                
+            <!-- Recent Transactions -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Recent Transactions</span>
+                        <div class="spinner-border spinner-border-sm text-primary loading-spinner" id="transactionsLoading" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="recentTransactions" class="p-3">
+                            
+                            @if (Model.Transactions != null && Model.Transactions.Any())
+                            {
+                                @foreach (var txn in Model.Transactions.Take(5))
+                                {
+                                    <div>@txn.Details - @txn.Amount</div>
+                                }
+                            }
+                            else
+                            {
+                                <div>No recent transactions found.</div>
+                            }
+
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="#transactions" class="btn btn-sm btn-outline-primary">View All Transactions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <!-- Spending Trend Chart -->
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Spending Trend</span>
+                        <div class="spinner-border spinner-border-sm text-primary loading-spinner" id="trendLoading" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="spendingTrendChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Budget Management Section -->
+   <section id="budget" class="mb-5">
+    <h2 class="mb-4">Budget Management</h2>
+
+    <div class="row">
+        <!-- Current Budget -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Current Budget</span>
+                    <div class="spinner-border spinner-border-sm text-primary loading-spinner d-none" id="budgetLoading" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="budgetDetails">
+                        @if (Model.Budget != null)
+                        {
+                            <ul class="list-group">
+                                <ul class="list-group">
+                                    <li class="list-group-item">Entertainment: $@Model.Budget.EntertainmentBudget</li>
+                                    <li class="list-group-item">Education: $@Model.Budget.EducationBudget</li>
+                                    <li class="list-group-item">Investment: $@Model.Budget.InvestmentBudget</li>
+                                    <li class="list-group-item">Daily Needs: $@Model.Budget.DailyNeedsBudget</li>
+                                    <li class="list-group-item">Housing: $@Model.Budget.HousingBudget</li>
+                                    <li class="list-group-item">Utilities: $@Model.Budget.UtilitiesBudget</li>
+                                    <li class="list-group-item">Transportation: $@Model.Budget.TransportationBudget</li>
+                                    <li class="list-group-item">Healthcare: $@Model.Budget.HealthcareBudget</li>
+                                    <li class="list-group-item">Savings Goal: $@Model.Budget.SavingsGoal</li>
+                                    <li class="list-group-item">Travel: $@Model.Budget.TravelBudget</li>
+                                </ul>
+
+                                <!-- Add more fields if necessary -->
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted py-4">No budget found</div>
+                        }
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <form method="get">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-sync-alt me-2"></i>Refresh Budget
+                            </button>
+                        </form>
+                        <form method="get" asp-page-handler="Require">
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-check-circle me-2"></i>Check Status
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Budget -->
+        <div class="col-md-6">
+            <div class="card mt-4 mt-md-0">
+                <div class="card-header">Generate New Budget</div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Generate">
+                        <div class="mb-3">
+                            <label for="income" class="form-label">Monthly Income</label>
+                            <input type="number" name="income" class="form-control" id="income" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="emi" class="form-label">EMI (Monthly Loan Payments)</label>
+                            <input type="number" name="emi" class="form-control" id="emi" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicalExpense" class="form-label">Medical Expenses</label>
+                            <input type="number" name="medicalExpense" class="form-control" id="medicalExpense" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="educationExpense" class="form-label">Education Expenses</label>
+                            <input type="number" name="educationExpense" class="form-control" id="educationExpense" required />
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-magic me-2"></i>Generate Budget
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                @if (Model.GeneratedBudget != null)
+                {
+                    <ul class="list-group">
+                        <ul class="list-group">
+                            <li class="list-group-item">Entertainment: $@Model.GeneratedBudget.EntertainmentBudget</li>
+                            <li class="list-group-item">Education: $@Model.GeneratedBudget.EducationBudget</li>
+                            <li class="list-group-item">Investment: $@Model.GeneratedBudget.InvestmentBudget</li>
+                            <li class="list-group-item">Daily Needs: $@Model.GeneratedBudget.DailyNeedsBudget</li>
+                            <li class="list-group-item">Housing: $@Model.GeneratedBudget.HousingBudget</li>
+                            <li class="list-group-item">Utilities: $@Model.GeneratedBudget.UtilitiesBudget</li>
+                            <li class="list-group-item">Transportation: $@Model.GeneratedBudget.TransportationBudget</li>
+                            <li class="list-group-item">Healthcare: $@Model.GeneratedBudget.HealthcareBudget</li>
+                            <li class="list-group-item">Savings Goal: $@Model.GeneratedBudget.SavingsGoal</li>
+                            <li class="list-group-item">Travel: $@Model.GeneratedBudget.TravelBudget</li>
+                        </ul>
+
+                        <!-- Add more fields if necessary -->
+                    </ul>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">No budget found</div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Budget Form -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">Create Custom Budget</div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="CreateCustom">
+                        <div class="row g-3">
+                            <!-- Period -->
+                            <div class="col-md-6">
+                                <label for="periodStart" class="form-label">Period Start</label>
+                                <input type="date" name="PeriodStart" class="form-control" id="periodStart" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="periodEnd" class="form-label">Period End</label>
+                                <input type="date" name="PeriodEnd" class="form-control" id="periodEnd" required>
+                            </div>
+
+                            <!-- Budget Inputs -->
+                            @foreach (var category in new[] { "Entertainment", "Education", "Investment", "DailyNeeds", "Housing", "Utilities", "Transportation", "Healthcare", "SavingsGoal", "Travel" })
+                            {
+                                var value = category switch
+                                {
+                                    "Entertainment" => Model.GeneratedBudget?.EntertainmentBudget,
+                                    "Education" => Model.GeneratedBudget?.EducationBudget,
+                                    "Investment" => Model.GeneratedBudget?.InvestmentBudget,
+                                    "DailyNeeds" => Model.GeneratedBudget?.DailyNeedsBudget,
+                                    "Housing" => Model.GeneratedBudget?.HousingBudget,
+                                    "Utilities" => Model.GeneratedBudget?.UtilitiesBudget,
+                                    "Transportation" => Model.GeneratedBudget?.TransportationBudget,
+                                    "Healthcare" => Model.GeneratedBudget?.HealthcareBudget,
+                                    "SavingsGoal" => Model.GeneratedBudget?.SavingsGoal,
+                                    "Travel" => Model.GeneratedBudget?.TravelBudget,
+                                    _ => null
+                                };
+
+                                <div class="col-md-4">
+                                    <label class="form-label" for="@category.ToLower()Budget">@category</label>
+                                    <input type="number"
+                                           name="@category"
+                                           class="form-control"
+                                           id="@category.ToLower()Budget"
+                                           required
+                                           value="@(value?.ToString("0.##") ?? "")" />
+                                </div>
+                            }
+
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary" id="createBudgetBtn">
+                                    <i class="fas fa-plus-circle me-2"></i>Create Budget
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Transactions Section -->
+    <section id="transactions" class="mb-5">
+        <h2 class="mb-4">Transactions</h2>
+            
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Add New Transaction</div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="AddTransaction">
+                            <div class="mb-3">
+                                <label for="transactionType" class="form-label">Transaction Type</label>
+                                <select class="form-select" id="transactionType" name="transactionType" required>
+                                    <option value="">Select type</option>
+                                    <option value="INCOME">Income</option>
+                                    <option value="ENTERTAINMENT">Entertainment</option>
+                                    <option value="EDUCATION">Education</option>
+                                    <option value="INVESTMENT">Investment</option>
+                                    <option value="DAILY_NEEDS">Daily Needs</option>
+                                    <option value="HOUSING">Housing</option>
+                                    <option value="UTILITIES">Utilities</option>
+                                    <option value="TRANSPORTATION">Transportation</option>
+                                    <option value="HEALTHCARE">Healthcare</option>
+                                    <option value="SAVINGS">Savings</option>
+                                    <option value="TRAVEL">Travel</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="details" class="form-label">Details</label>
+                                <input type="text" class="form-control" id="details" name="details" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Add Transaction
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+                
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Transaction History</span>
+                        <div class="spinner-border spinner-border-sm text-primary loading-spinner" id="transactionHistoryLoading" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="transactionHistory" class="p-3">
+                            @if (Model.Transactions != null && Model.Transactions.Any())
+                            {
+                                @foreach (var txn in Model.Transactions.Take(5))
+                                {
+                                    <div>@txn.Details - @txn.Amount</div>
+                                }
+                            }
+                            else
+                            {
+                                <div>No recent transactions found.</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary w-100" id="getTransactionsBtn">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh Transactions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Footer -->
+
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+<!-- App JavaScript -->
+
+</body>
+</html>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("chartLoading").style.display = "none";
+            document.getElementById("transactionsLoading").style.display = "none";
+
+            const budget = @Html.Raw(JsonSerializer.Serialize(Model.Budget));
+            if (budget?.categories) {
+                const labels = budget.categories.map(c => c.name);
+                const data = budget.categories.map(c => c.amount);
+
+                new Chart(document.getElementById('budgetDistributionChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        const ctx = document.getElementById('budgetChart').getContext('2d');
+        const budgetChart = new Chart(ctx, {
+            type: 'bar', // or 'pie' if preferred
+            data: {
+                labels: [
+                    'Entertainment', 'Education', 'Investment', 'Daily Needs',
+                    'Housing', 'Utilities', 'Transportation', 'Healthcare',
+                    'Savings Goal', 'Travel'
+                ],
+                datasets: [{
+                    label: 'Budget ($)',
+                    data: [
+                        @Model.Budget.EntertainmentBudget,
+                        @Model.Budget.EducationBudget,
+                        @Model.Budget.InvestmentBudget,
+                        @Model.Budget.DailyNeedsBudget,
+                        @Model.Budget.HousingBudget,
+                        @Model.Budget.UtilitiesBudget,
+                        @Model.Budget.TransportationBudget,
+                        @Model.Budget.HealthcareBudget,
+                        @Model.Budget.SavingsGoal,
+                        @Model.Budget.TravelBudget
+                    ],
+                    backgroundColor: [
+                        '#4dc9f6', '#f67019', '#f53794', '#537bc4',
+                        '#acc236', '#166a8f', '#00a950', '#58595b',
+                        '#8549ba', '#ffcc00'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Custom Budget Distribution'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        }); 
+    </script>
+}

@@ -95,4 +95,5 @@
 /Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/Frontend.genruntimeconfig.cache
 /Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/ref/Frontend.dll
 /Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/os09u9acvr-vyvz9tvqbk.gz
-/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-16ckeigbb2.gz
+/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/Frontend.sourcelink.json
+/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-fkeoclfddm.gz

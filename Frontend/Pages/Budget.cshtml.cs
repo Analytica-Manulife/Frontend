@@ -1,0 +1,101 @@
+using BudgetService.Data;
+using BudgetService.Properties.Data;
+using Frontend.Service;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Frontend.Pages;
+
+public class BudgetModel : PageModel
+{
+    private readonly BudgetApiService _api;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public BudgetModel(BudgetApiService api, IHttpContextAccessor httpContextAccessor)
+    {
+        _api = api;
+        _httpContextAccessor = httpContextAccessor;
+
+    }
+
+    public string? Status { get; set; }
+    public Budget? Budget { get; set; }
+    public Budget? GeneratedBudget { get; set; }
+
+    public List<Transaction>? Transactions { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        var accountIdStr = _httpContextAccessor.HttpContext?.Session.GetString("AccountId");
+        Status = await _api.GetServiceStatusAsync();
+        Budget = await _api.GetBudgetAsync(accountIdStr);
+        Transactions = await _api.GetTransactionsAsync(accountIdStr);
+        Console.WriteLine(Transactions.Count);
+    }
+
+    public async Task<IActionResult> OnPostGenerate(
+         decimal income, decimal emi, decimal educationExpense, decimal medicalExpense)
+    {
+        var accountId = _httpContextAccessor.HttpContext?.Session.GetString("AccountId");
+
+        var request = new BudgetRequest
+        {
+            Income = income,
+            EMI = emi,
+            EducationExpense = educationExpense,
+            MedicalExpense = medicalExpense
+        };
+        GeneratedBudget = await _api.GenerateBudgetAsync(accountId, request);
+        Transactions = await _api.GetTransactionsAsync(accountId);
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAddTransaction(
+        string transactionType, decimal amount, string details)
+    {        
+        var accountId = _httpContextAccessor.HttpContext?.Session.GetString("AccountId");
+
+        var txn = new Transaction
+        {
+            AccountId = Guid.Parse(accountId),
+            TransactionType = transactionType,
+            Amount = amount,
+            Details = details,
+            TransactionDate = DateTime.UtcNow
+        };
+
+        await _api.CreateTransactionAsync(accountId, txn);
+        Transactions = await _api.GetTransactionsAsync(accountId);
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostCreateCustom(
+        DateTime periodStart, DateTime periodEnd, decimal Entertainment, decimal Education,
+        decimal Investment, decimal DailyNeeds, decimal Housing, decimal Utilities,
+        decimal Transportation, decimal Healthcare, decimal SavingsGoal, decimal Travel)
+    {
+        var accountId = _httpContextAccessor.HttpContext?.Session.GetString("AccountId");
+
+        var customBudget = new Budget
+        {
+            AccountId = Guid.Parse(accountId),
+            PeriodStart = periodStart,
+            PeriodEnd = periodEnd,
+            EntertainmentBudget = Entertainment,
+            EducationBudget = Education,
+            InvestmentBudget = Investment,
+            DailyNeedsBudget = DailyNeeds,
+            HousingBudget = Housing,
+            UtilitiesBudget = Utilities,
+            TransportationBudget = Transportation,
+            HealthcareBudget = Healthcare,
+            SavingsGoal = SavingsGoal,
+            TravelBudget = Travel
+        };
+
+        await _api.CreateBudgetAsync(accountId, customBudget);
+        Budget = await _api.GetBudgetAsync(accountId);
+        return Page();
+    }
+
+}

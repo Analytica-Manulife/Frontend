@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "qojtuSmviK1Lc3rfCfK44LoDJ1sX4IPNS8jPXaQmFRY=",
+  "Hash": "Uqe/Tna4IavWR942pMjkHZB8ijQZFpcGVEnHPsd4E7I=",
   "Source": "Frontend",
   "BasePath": "_content/Frontend",
   "Mode": "Default",
@@ -185,12 +185,12 @@
       "OriginalItemSpec": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/wwwroot/js/site.js"
     },
     {
-      "Identity": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-16ckeigbb2.gz",
+      "Identity": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-fkeoclfddm.gz",
       "SourceId": "Frontend",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/Frontend",
-      "RelativePath": "css/site#[.{fingerprint=16ckeigbb2}]?.css.gz",
+      "RelativePath": "css/site#[.{fingerprint=fkeoclfddm}]?.css.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -199,8 +199,8 @@
       "RelatedAsset": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/wwwroot/css/site.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "efr2i55by3",
-      "Integrity": "Wo1a9NTZ148DOU+bWe1ZQGi607na2MqxbApnMAM/WU0=",
+      "Fingerprint": "7r6tbs0j2d",
+      "Integrity": "c2L9oIg9wNFtRMdWZLKBefyX8rr9ADLi9I4QEhdb8F4=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/wwwroot/css/site.css"
@@ -1459,8 +1459,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "16ckeigbb2",
-      "Integrity": "mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio=",
+      "Fingerprint": "fkeoclfddm",
+      "Integrity": "v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/css/site.css"
@@ -3068,13 +3068,13 @@
       ]
     },
     {
-      "Route": "css/site.16ckeigbb2.css",
-      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-16ckeigbb2.gz",
+      "Route": "css/site.css",
+      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-fkeoclfddm.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000403063281"
+          "Quality": "0.000403225806"
         }
       ],
       "ResponseHeaders": [
@@ -3084,19 +3084,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2480"
+          "Value": "2479"
         },
         {
           "Name": "ETag",
-          "Value": "\"Wo1a9NTZ148DOU+bWe1ZQGi607na2MqxbApnMAM/WU0=\""
+          "Value": "\"c2L9oIg9wNFtRMdWZLKBefyX8rr9ADLi9I4QEhdb8F4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 07 May 2025 04:13:55 GMT"
+          "Value": "Thu, 08 May 2025 03:01:13 GMT"
         },
         {
           "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
+          "Value": "no-cache"
         },
         {
           "Name": "Content-Encoding",
@@ -3112,26 +3112,18 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio=\""
+          "Value": "W/\"v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw=\""
         }
       ],
       "EndpointProperties": [
         {
-          "Name": "fingerprint",
-          "Value": "16ckeigbb2"
-        },
-        {
-          "Name": "label",
-          "Value": "css/site.css"
-        },
-        {
           "Name": "integrity",
-          "Value": "sha256-mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio="
+          "Value": "sha256-v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw="
         }
       ]
     },
     {
-      "Route": "css/site.16ckeigbb2.css",
+      "Route": "css/site.css",
       "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/wwwroot/css/site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -3141,7 +3133,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "11054"
+          "Value": "11055"
         },
         {
           "Name": "Content-Type",
@@ -3149,11 +3141,156 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio=\""
+          "Value": "\"v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 07 May 2025 04:13:55 GMT"
+          "Value": "Thu, 08 May 2025 03:01:13 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.css.gz",
+      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-fkeoclfddm.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2479"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"c2L9oIg9wNFtRMdWZLKBefyX8rr9ADLi9I4QEhdb8F4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 08 May 2025 03:01:13 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-c2L9oIg9wNFtRMdWZLKBefyX8rr9ADLi9I4QEhdb8F4="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.fkeoclfddm.css",
+      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-fkeoclfddm.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000403225806"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "2479"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"c2L9oIg9wNFtRMdWZLKBefyX8rr9ADLi9I4QEhdb8F4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 08 May 2025 03:01:13 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "fkeoclfddm"
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.fkeoclfddm.css",
+      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/wwwroot/css/site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "11055"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 08 May 2025 03:01:13 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -3163,7 +3300,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "16ckeigbb2"
+          "Value": "fkeoclfddm"
         },
         {
           "Name": "label",
@@ -3171,13 +3308,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio="
+          "Value": "sha256-v48EfPhth7B/OmUlzGbpyZNPqTLNmAkrURtym7zrPkw="
         }
       ]
     },
     {
-      "Route": "css/site.16ckeigbb2.css.gz",
-      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-16ckeigbb2.gz",
+      "Route": "css/site.fkeoclfddm.css.gz",
+      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-fkeoclfddm.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -3186,7 +3323,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2480"
+          "Value": "2479"
         },
         {
           "Name": "Content-Type",
@@ -3194,11 +3331,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Wo1a9NTZ148DOU+bWe1ZQGi607na2MqxbApnMAM/WU0=\""
+          "Value": "\"c2L9oIg9wNFtRMdWZLKBefyX8rr9ADLi9I4QEhdb8F4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 07 May 2025 04:13:55 GMT"
+          "Value": "Thu, 08 May 2025 03:01:13 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -3216,7 +3353,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "16ckeigbb2"
+          "Value": "fkeoclfddm"
         },
         {
           "Name": "label",
@@ -3224,144 +3361,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-Wo1a9NTZ148DOU+bWe1ZQGi607na2MqxbApnMAM/WU0="
-        }
-      ]
-    },
-    {
-      "Route": "css/site.css",
-      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-16ckeigbb2.gz",
-      "Selectors": [
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip",
-          "Quality": "0.000403063281"
-        }
-      ],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "2480"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"Wo1a9NTZ148DOU+bWe1ZQGi607na2MqxbApnMAM/WU0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Wed, 07 May 2025 04:13:55 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "W/\"mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio=\""
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio="
-        }
-      ]
-    },
-    {
-      "Route": "css/site.css",
-      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/wwwroot/css/site.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "11054"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Wed, 07 May 2025 04:13:55 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-mZB1sb0XwPpnSxKX9PZL4K1hIfQOpq4hcbTI+pNzvio="
-        }
-      ]
-    },
-    {
-      "Route": "css/site.css.gz",
-      "AssetFile": "/Users/yashmehta/AnalyticaManulife/Frontend/Frontend/obj/Debug/net9.0/compressed/31k4o5v5c6-16ckeigbb2.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "2480"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"Wo1a9NTZ148DOU+bWe1ZQGi607na2MqxbApnMAM/WU0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Wed, 07 May 2025 04:13:55 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-Wo1a9NTZ148DOU+bWe1ZQGi607na2MqxbApnMAM/WU0="
+          "Value": "sha256-c2L9oIg9wNFtRMdWZLKBefyX8rr9ADLi9I4QEhdb8F4="
         }
       ]
     },

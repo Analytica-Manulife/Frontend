@@ -1,0 +1,382 @@
+@page
+@model PortfolioModel
+@using StockMarketMicroservice.Models
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Portfolio</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0A5E2F;
+            --secondary-color: #f8f9fa;
+            --positive-color: #0A5E2F;
+            --negative-color: #dc3545;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+        
+        .navbar {
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .portfolio-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .stock-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .stock-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        
+        .stock-price {
+            font-weight: bold;
+        }
+        
+        .positive {
+            color: var(--positive-color);
+        }
+        
+        .negative {
+            color: var(--negative-color);
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        .table th {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .company-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #084525;
+            border-color: #084525;
+        }
+        
+        .dividend-chart {
+            height: 200px;
+        }
+        
+        .time-filter {
+            display: flex;
+            gap: 5px;
+        }
+        .company-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+        .time-filter button {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            background: transparent;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .time-filter button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .stock-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+   <div>
+    <!-- Main Content -->
+    <div class="container py-4">
+        <div class="row align-items-center mb-4">
+            <div class="col-lg-6">
+                <h1 class="news-title">
+                    <i class="fas fa-newspaper me-2"></i>Your Portfolio
+                </h1>
+            </div>
+            <div class="col-lg-6">
+                <form method="get" class="news-search-form">
+                    <div class="input-group">
+                        <input type="text" class="form-control"  id="stockSearch" name="Search" placeholder="Search for stock...">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <!-- Portfolio Summary -->
+            <!-- Portfolio Summary -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        Portfolio Value
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        @{
+                            decimal totalValue = Model.PortfolioList?.Sum(p => p.Last_Price * p.Quantity) ?? 0;
+                            decimal totalCost = Model.PortfolioList?.Sum(p => p.Buy_Price * p.Quantity) ?? 0;
+                            decimal totalProfit = totalValue - totalCost;
+                            decimal todayChange = Model.PortfolioList?.Sum(p => p.Change_Amount * p.Quantity) ?? 0;
+                        }
+                        <div class="portfolio-value">$@totalValue.ToString("N2")</div>
+                        <div class="d-flex justify-content-between mt-3">
+                            <div>
+                                <small class="text-muted">All-time profit</small>
+                                <div class="fw-bold @(totalProfit >= 0 ? "positive" : "negative")">
+                                    $@totalProfit.ToString("N2")
+                                </div>
+                            </div>
+                            <div>
+                                <small class="text-muted">Today's change</small>
+                                <div class="fw-bold @(todayChange >= 0 ? "positive" : "negative")">
+                                    @(todayChange >= 0 ? "+" : "")$@todayChange.ToString("N2")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Portfolio Performance -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">Top Gainers</div>
+                    <div class="card-body p-2">
+                        @foreach (var stock in @Model.PortfolioList?.OrderByDescending(p => p.Change_Percent).Take(3) ?? Enumerable.Empty<Portfolio>())
+                        {
+                            <div class="stock-card">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="stock-logo bg-dark text-white">
+                                        <img src="@stock.Logo" alt="@stock.Company_Name" class="img-fluid" onerror="this.onerror=null;this.innerHTML='<i class=\'fas fa-chart-line\'></i>';">
+                                    </div>
+                                    <div>
+                                        <a style="text-decoration: none" asp-area="" asp-page="/StockData" asp-route-ticker="@stock.Ticker">
+                                            <div class="fw-bold">@stock.Ticker</div>
+                                        </a>
+                                        <div class="small text-muted">@stock.Company_Name</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <div class="stock-price">$@stock.Last_Price.ToString("N2")</div>
+                                    <div class="@(stock.Change_Amount >= 0 ? "positive" : "negative")">
+                                        <i class="fas fa-caret-@(stock.Change_Amount >= 0 ? "up" : "down")"></i> @stock.Change_Percent
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                Last Transactions
+                <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">Recent Activity</small>
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var transaction in @Model.TransactionList?.OrderByDescending(t => t.TransactionDate).Take(5) ?? Enumerable.Empty<StockTransaction>())
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="stock-logo bg-primary text-white">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <a style="text-decoration: none" asp-area="" asp-page="/StockData" asp-route-ticker="@transaction.Ticker">
+                                            <div class="fw-bold">@transaction.Ticker</div>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>@transaction.TransactionDate.ToString("MMM dd, hh:mm tt")</td>
+                                <td><span class="badge bg-success">Success</span></td>
+                                <td>$@transaction.Amount.ToString("N2")</td>
+                                <td>$@transaction.Quantity</td>
+
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Watch Table -->
+        <div class="market-watch mb-5">
+            <h3 class="section-title">
+                <i class="fas fa-table-list me-2"></i>Market Watch
+            </h3>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table market-table mb-0">
+                        <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Date</th>
+                            <th>Price</th>
+                            <th>Open</th>
+                            <th>High</th>
+                            <th>Low</th>
+                            <th>Volume</th>
+                            <th>Change</th>
+                            <th>Total Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var stock in Model.Stocks)
+                        {
+                            <tr>
+                                <a style="text-decoration: none" asp-area="" asp-page="/StockData" asp-route-ticker="@stock.Ticker">
+                                    <td>
+                                        <a style="text-decoration: none" asp-area="" asp-page="/StockData" asp-route-ticker="@stock.Ticker">
+                                            <div class="d-flex align-items-center">
+                                                <div class="company-icon">
+                                                    <img src="@stock.Logo" alt="@stock.CompanyName Logo" class="img-fluid w-100 h-100 object-fit-cover">
+                                                </div>
+                                                <div>
+
+                                                    <a style="text-decoration: none" asp-area="" asp-page="/StockData" asp-route-ticker="@stock.Ticker">
+                                                        <div class="fw-bold">@stock.CompanyName</div>
+                                                    </a>
+                                                    <small class="text-muted">@stock.Ticker</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </td>
+                                    <td>@stock.LatestTradingDay.ToString("yyyy-MM-dd")</td>
+                                    <td class="fw-bold">@stock.Price.ToString("C")</td>
+                                    <td>@stock.OpenPrice.ToString("C")</td>
+                                    <td>@stock.HighPrice.ToString("C")</td>
+                                    <td>@stock.LowPrice.ToString("C")</td>
+                                    <td>@stock.Volume.ToString("N0")</td>
+                                    <td class="change-value @(stock.ChangeAmount > 0 ? "positive" : "negative")">
+                                        @if (stock.ChangeAmount > 0)
+                                        {
+                                            <i class="fas fa-arrow-up me-1"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-arrow-down me-1"></i>
+                                        }
+                                        @stock.ChangeAmount.ToString("N2") (@stock.ChangePercent)
+                                    </td>
+                                    <td>
+                                        @{
+                                            var totalValue = stock.Price * stock.Volume;
+                                        }
+                                        @totalValue.ToString("C0")
+                                    </td>
+                                </a>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
