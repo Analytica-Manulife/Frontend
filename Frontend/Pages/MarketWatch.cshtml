@@ -1,0 +1,629 @@
+@page
+@model MarketWatch
+@{
+ViewData["Title"] = "Market Watch";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for the graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .market-page {
+            padding: 20px 0;
+        }
+
+        .market-title {
+            color: #0d6832;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .carousel-controls button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.3rem;
+        }
+
+        .carousel-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+
+        .prev-btn, .next-btn {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prev-btn:hover, .next-btn:hover {
+            background-color: #0d6832;
+            color: white;
+        }
+
+        .company-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #0d6832;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .stock-carousel-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .stock-carousel {
+            display: flex;
+            overflow-x: auto;
+            gap: 16px;
+            padding: 10px 0;
+            scroll-behavior: smooth;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .stock-carousel::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .stock-card {
+            min-width: 280px;
+            flex-shrink: 0;
+        }
+
+        .stock-card .card {
+            height: 100%;
+        }
+
+        .stock-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .company-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .company-info {
+            flex-grow: 1;
+        }
+
+        .company-name {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        .stock-ticker {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+        .stock-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .stock-change {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .positive-change {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .negative-change {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .stock-stats {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            width: 50%;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .market-search-form {
+            position: relative;
+        }
+
+        .market-search-form input {
+            padding-right: 40px;
+            border-radius: 20px;
+        }
+
+        .market-search-form button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0d6832;
+            border-color: #0d6832;
+        }
+
+        .market-table {
+            margin-top: 20px;
+        }
+
+        .market-table th {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6c757d;
+            border-top: none;
+            padding: 12px 8px;
+        }
+
+        .market-table td {
+            vertical-align: middle;
+            font-size: 0.9rem;
+            padding: 12px 8px;
+        }
+
+        .company-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+
+        /* Color the change values */
+        td.change-value {
+            font-weight: 600;
+        }
+
+        td.change-value.positive {
+            color: #28a745;
+        }
+
+        td.change-value.negative {
+            color: #dc3545;
+        }
+
+        .featured-stock {
+            margin-bottom: 30px;
+        }
+
+        .featured-stock .card {
+            position: relative;
+        }
+
+        .featured-stock-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .featured-stock-content {
+            padding: 20px;
+        }
+
+        .featured-stock-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .featured-stock-price {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container market-page">
+    <div class="row align-items-center mb-4">
+        <div class="col-lg-6">
+            <h1 class="market-title">
+                <i class="fas fa-chart-line me-2"></i>Market Watch
+            </h1>
+        </div>
+        <div class="col-lg-6">
+            <form class="market-search-form">
+                <div class="input-group">
+                    <input type="text" id="stockSearch" class="form-control" placeholder="Search by company name...">
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Top Gainers Carousel Section -->
+    <div class="top-gainers mb-5">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-arrow-trend-up me-2"></i>Top Gainers
+            </h3>
+            <div class="carousel-controls">
+                <button class="prev-btn" id="prevGainersBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="next-btn" id="nextGainersBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="stock-carousel-container">
+            <div class="stock-carousel" id="gainersCarousel">
+                @foreach (var stock in Model.TopGainers)
+                {<a style="text-decoration: none" asp-area="" asp-page="/StockData" asp-route-ticker="@stock.Ticker">
+                    <div class="stock-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="stock-header">
+                                    <div class="company-logo">
+                                        <img src="@stock.Logo" alt="@stock.Ticker Logo" class="img-fluid">
+                                    </div>
+                                    <div class="company-info">
+                                        <h5 class="stock-ticker">@stock.Ticker</h5>
+                                        <p class="company-name">@stock.CompanyName</p>
+                                    </div>
+                                </div>
+
+                                <div class="text-center py-3">
+                                    <div class="stock-price">$@stock.Price.ToString("N2")</div>
+                                    <div class="stock-change positive-change">
+                                        <i class="fas fa-arrow-up me-1"></i>@stock.ChangePercent
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                }
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Market Watch Table Section -->
+    <div class="market-watch mb-5">
+        <h3 class="section-title">
+            <i class="fas fa-table-list me-2"></i>Market Watch
+        </h3>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table market-table mb-0">
+                    <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Date</th>
+                        <th>Price</th>
+                        <th>Open</th>
+                        <th>High</th>
+                        <th>Low</th>
+                        <th>Volume</th>
+                        <th>Change</th>
+                        <th>Total Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var stock in Model.Stocks)
+                    {
+                        <tr>
+                            <a style="text-decoration: none" asp-area="" asp-page="/StockData" asp-route-ticker="@stock.Ticker">
+                                <td>
+                                    <a style="text-decoration: none" asp-area="" asp-page="/StockData" asp-route-ticker="@stock.Ticker">
+                                        <div class="d-flex align-items-center">
+                                            <div class="company-icon">
+                                                <img src="@stock.Logo" alt="@stock.CompanyName Logo" class="img-fluid w-100 h-100 object-fit-cover">
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">@stock.CompanyName</div>
+                                                <small class="text-muted">@stock.Ticker</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </td>
+                            <td>@stock.LatestTradingDay.ToString("yyyy-MM-dd")</td>
+                            <td class="fw-bold">@stock.Price.ToString("C")</td>
+                            <td>@stock.OpenPrice.ToString("C")</td>
+                            <td>@stock.HighPrice.ToString("C")</td>
+                            <td>@stock.LowPrice.ToString("C")</td>
+                            <td>@stock.Volume.ToString("N0")</td>
+                            <td class="change-value @(stock.ChangeAmount > 0 ? "positive" : "negative")">
+                                @if (stock.ChangeAmount > 0)
+                                {
+                                    <i class="fas fa-arrow-up me-1"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-arrow-down me-1"></i>
+                                }
+                                @stock.ChangeAmount.ToString("N2") (@stock.ChangePercent)
+                            </td>
+                            <td>
+                                @{
+                                    var totalValue = stock.Price * stock.Volume;
+                                }
+                                @totalValue.ToString("C0")
+                            </td>
+                    </a>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        document.getElementById('stockSearch').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.market-table tbody tr');
+
+            rows.forEach(row => {
+                const companyName = row.querySelector('td div div').textContent.toLowerCase();
+                const ticker = row.querySelector('td small').textContent.toLowerCase();
+                row.style.display = companyName.includes(searchValue) || ticker.includes(searchValue) ? '' : 'none';
+            });
+        });
+
+        // Stock Carousel Navigation
+        const gainersCarousel = document.getElementById('gainersCarousel');
+        const prevGainersBtn = document.getElementById('prevGainersBtn');
+        const nextGainersBtn = document.getElementById('nextGainersBtn');
+
+        if (gainersCarousel && prevGainersBtn && nextGainersBtn) {
+            const cardWidth = gainersCarousel.querySelector('.stock-card')?.offsetWidth;
+            const gap = 16; // Gap between cards
+
+            nextGainersBtn.addEventListener('click', function() {
+                if (cardWidth) {
+                    const scrollBy = cardWidth + gap;
+                    gainersCarousel.scrollBy({ left: scrollBy, behavior: 'smooth' });
+                }
+            });
+
+            prevGainersBtn.addEventListener('click', function() {
+                if (cardWidth) {
+                    const scrollBy = cardWidth + gap;
+                    gainersCarousel.scrollBy({ left: -scrollBy, behavior: 'smooth' });
+                }
+            });
+
+            // Check if we need to show/hide buttons
+            gainersCarousel.addEventListener('scroll', function() {
+                const maxScrollLeft = gainersCarousel.scrollWidth - gainersCarousel.clientWidth;
+
+                if (gainersCarousel.scrollLeft <= 10) {
+                    prevGainersBtn.classList.add('disabled');
+                } else {
+                    prevGainersBtn.classList.remove('disabled');
+                }
+
+                if (Math.abs(gainersCarousel.scrollLeft - maxScrollLeft) < 10) {
+                    nextGainersBtn.classList.add('disabled');
+                } else {
+                    nextGainersBtn.classList.remove('disabled');
+                }
+            });
+
+            // Trigger scroll event to set initial button states
+            gainersCarousel.dispatchEvent(new Event('scroll'));
+        }
+
+        // Chart.js Configuration
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    display: false
+                }
+            },
+            elements: {
+                line: {
+                    tension: 0.4
+                },
+                point: {
+                    radius: 0
+                }
+            }
+        };
+
+        // Apple Chart
+        const aaplCtx = document.getElementById('aaplChart').getContext('2d');
+        const aaplChart = new Chart(aaplCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                datasets: [{
+                    label: 'Apple Stock Price',
+                    data: [190, 195, 205, 210, 215, 210, 205, 210, 205, 200, 198.89],
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+
+        // Google Chart
+        const googlCtx = document.getElementById('googlChart').getContext('2d');
+        const googlChart = new Chart(googlCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+                datasets: [{
+                    label: 'Alphabet Stock Price',
+                    data: [2500, 2550, 2600, 2620, 2650, 2700, 2680, 2700, 2720, 2735, 2750],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+
+        // Market Indices Charts
+        const sp500Ctx = document.getElementById('sp500Chart').getContext('2d');
+        new Chart(sp500Ctx, {
+            type: 'line',
+            data: {
+                labels: Array(20).fill(''),
+                datasets: [{
+                    data: [5100, 5120, 5150, 5180, 5160, 5190, 5210, 5230, 5200, 5220, 5240, 5246.38],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderWidth: 1.5,
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+
+        const nasdaqCtx = document.getElementById('nasdaqChart').getContext('2d');
+        new Chart(nasdaqCtx, {
+            type: 'line',
+            data: {
+                labels: Array(20).fill(''),
+                datasets: [{
+                    data: [16200, 16300, 16400, 16350, 16450, 16500, 16550, 16600, 16650, 16700, 16734.17],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderWidth: 1.5,
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+
+        const dowCtx = document.getElementById('dowChart').getContext('2d');
+        new Chart(dowCtx, {
+            type: 'line',
+            data: {
+                labels: Array(20).fill(''),
+                datasets: [{
+                    data: [38500, 38600, 38700, 38650, 38750, 38800, 38850, 38900, 38932.12],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderWidth: 1.5,
+                    fill: true
+                }]
+            },
+            options: chartOptions
+        });
+    });
+</script>
+</body>
+</html>

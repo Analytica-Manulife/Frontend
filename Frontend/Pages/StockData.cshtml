@@ -1,0 +1,474 @@
+@page "{ticker}"
+@model Frontend.Pages.StockDataModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Inc. (AAPL) - Market Watch</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0d6832;
+            --secondary-color: #f8f9fa;
+            --positive-color: #0d6832;
+            --negative-color: #dc3545;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color) !important;
+        }
+        
+        .stock-header {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stock-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .stock-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .price-change.positive {
+            color: var(--positive-color);
+        }
+        
+        .price-change.negative {
+            color: var(--negative-color);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .btn-buy {
+            background-color: var(--positive-color);
+            color: white;
+        }
+        
+        .btn-sell {
+            background-color: var(--negative-color);
+            color: white;
+        }
+        
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .stats-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .chart-container {
+            height: 400px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            border-radius: 5px;
+        }
+        
+        .time-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .time-filter button {
+            border: 1px solid #dee2e6;
+            background-color: white;
+            border-radius: 5px;
+            padding: 5px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .time-filter button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .news-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .news-date {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        
+        .table-stats th {
+            font-weight: 500;
+            color: #6c757d;
+        }
+        
+        .table-stats td {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+   
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <!-- Stock Header -->
+        <div class="stock-header p-4 mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <img src="@Model.Stock.Logo" alt="Apple Logo" class="stock-logo me-3">
+                        <div>
+                            <h1 class="mb-0">@Model.Stock.CompanyName <span class="text-muted fs-5">(@Model.Stock.CompanyName)</span></h1>
+                            <p class="text-muted mb-0">@Model.LiveStockData.Exchange • @Model.LiveStockData.Currency</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <div class="stock-price">@Model.Stock.Price</div>
+                    <div class="price-change negative">
+                        <i class="fas fa-caret-down"></i> @Model.Stock.ChangeAmount (@Model.Stock.ChangePercent)
+                    </div>
+                    <div class="text-muted small">Last updated: @Model.Stock.LastUpdated</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Column - Chart and Stats -->
+            <div class="col-lg-8">
+                <!-- Chart Section -->
+           
+
+                <!-- Key Statistics -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Key Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">Open</div>
+                                <div class="stats-value">@Model.Stock.OpenPrice</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">Previous Close</div>
+                                <div class="stats-value">@Model.Stock.LastPrice</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">Day Range</div>
+                                <div class="stats-value">@Model.Stock.OpenPrice - @Model.Stock.LastPrice</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">52 Week Range</div>
+                                <div class="stats-value">@Model.Stock.LowPrice - @Model.Stock.HighPrice</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">Volume</div>
+                                <div class="stats-value">@Model.Stock.Volume</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">Avg. Volume</div>
+                                <div class="stats-value">@Model.Stock.Volume</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">Market Cap</div>
+                                <div class="stats-value">@Model.Total</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">P/E Ratio</div>
+                                <div class="stats-value">@Model.LiveStockData.PERatio</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stats-label">Dividend Yield</div>
+                                <div class="stats-value">@Model.LiveStockData.DividendYield</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Company Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>@Model.LiveStockData.Description</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <table class="table table-stats">
+                                    <tbody>
+                                        <tr>
+                                            <th>Industry</th>
+                                            <td>@Model.LiveStockData.Industry</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Headquarters</th>
+                                            <td>@Model.LiveStockData.Address</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Trailing PE</th>
+                                            <td>@Model.LiveStockData.TrailingPE</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-stats">
+                                    <tbody>
+                                        <tr>
+                                            <th>Gross Profit TTM</th>
+                                            <td>@Model.LiveStockData.GrossProfitTTM</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Sector</th>
+                                            <td>@Model.LiveStockData.Sector</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Latest Quarter</th>
+                                            <td><a href="https://www.apple.com" target="_blank">@Model.LiveStockData.LatestQuarter</a></td>
+                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+
+            
+
+<div class="col-lg-4">
+    <!-- Trade Card -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Trade @Model.Stock.Ticker</h5>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs mb-3" id="tradeTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="buy-tab" data-bs-toggle="tab" data-bs-target="#buy" type="button" role="tab" aria-controls="buy" aria-selected="true">Buy</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sell-tab" data-bs-toggle="tab" data-bs-target="#sell" type="button" role="tab" aria-controls="sell" aria-selected="false">Sell</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="tradeTabContent">
+            <!-- Buy Tab -->
+            <div class="tab-pane fade show active" id="buy" role="tabpanel" aria-labelledby="buy-tab">
+                <form method="post" asp-page-handler="Buy">
+                    <input type="hidden" name="Ticker" value="@Model.Stock.Ticker" />
+                    <input type="hidden" name="AccountId" value="@Model.AccountId" />
+                    <input type="hidden" id="buyPrice" name="Price" value="@Model.Stock.Price" />
+
+                    <div class="mb-3">
+                        <label for="buyQuantity" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="buyQuantity" name="Quantity" min="1" value="1">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" value="@Model.Stock.Price.ToString("0.00")" readonly>
+                        </div>
+                        <div class="form-text">Current market price: $@Model.Stock.Price</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="buyTotal" class="form-label">Total</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" id="buyTotal" readonly>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-buy w-100">Buy @Model.Stock.Ticker</button>
+                </form>
+            </div>
+
+            <!-- Sell Tab -->
+            <div class="tab-pane fade" id="sell" role="tabpanel" aria-labelledby="sell-tab">
+                <form method="post" asp-page-handler="Sell">
+                    <input type="hidden" name="Ticker" value="@Model.Stock.Ticker" />
+                    <input type="hidden" name="AccountId" value="@Model.AccountId" />
+                    <input type="hidden" id="sellPrice" name="Price" value="@Model.Stock.Price" />
+
+                    <div class="mb-3">
+                        <label for="sellQuantity" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="sellQuantity" name="Quantity" min="1" value="1" max="10">
+                        <div class="form-text">You own: 10 shares</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" value="@Model.Stock.Price.ToString("0.00")" readonly>
+                        </div>
+                        <div class="form-text">Current market price: $@Model.Stock.Price</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sellTotal" class="form-label">Total</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" id="sellTotal" readonly>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sell w-100">Sell @Model.Stock.Ticker</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*     <!-- Portfolio Summary --> *@
+@*     <div class="card mb-4"> *@
+@*         <div class="card-header"> *@
+@*             <h5 class="mb-0">Your @Model.Stock.Symbol Position</h5> *@
+@*         </div> *@
+@*         <div class="card-body"> *@
+@*             <div class="row"> *@
+@*                 <div class="col-6 mb-3"> *@
+@*                     <div class="stats-label">Shares Owned</div> *@
+@*                     <div class="stats-value">@quantityOwned</div> *@
+@*                 </div> *@
+@*                 <div class="col-6 mb-3"> *@
+@*                     <div class="stats-label">Avg. Cost</div> *@
+@*                     <div class="stats-value">$@avgCost.ToString("0.00")</div> *@
+@*                 </div> *@
+@*                 <div class="col-6 mb-3"> *@
+@*                     <div class="stats-label">Market Value</div> *@
+@*                     <div class="stats-value">$@marketValue.ToString("0.00")</div> *@
+@*                 </div> *@
+@*                 <div class="col-6 mb-3"> *@
+@*                     <div class="stats-label">Total Return</div> *@
+@*                     <div class="stats-value @(totalReturn >= 0 ? "text-success" : "text-danger")"> *@
+@*                         @((totalReturn >= 0 ? "+" : "") + totalReturn.ToString("0.00")) (@returnPercent.ToString("0.00")%) *@
+@*                     </div> *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Market Watch. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 text-muted small">Data provided by Alpha Vantage. Market data is delayed by at least 15 minutes.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+
+        function calculateTotal(quantityId, priceId, totalId) {
+            const qty = parseFloat(document.getElementById(quantityId).value);
+            const price = parseFloat(document.getElementById(priceId).value);
+            const totalField = document.getElementById(totalId);
+
+            if (!isNaN(qty) && !isNaN(price)) {
+                totalField.value = (qty * price).toFixed(2);
+            } else {
+                totalField.value = "";
+            }
+        }
+
+        document.getElementById("buyQuantity").addEventListener("input", () =>
+            calculateTotal("buyQuantity", "buyPrice", "buyTotal"));
+
+        document.getElementById("sellQuantity").addEventListener("input", () =>
+            calculateTotal("sellQuantity", "sellPrice", "sellTotal"));
+
+        // Trigger once on page load
+        calculateTotal("buyQuantity", "buyPrice", "buyTotal");
+        calculateTotal("sellQuantity", "sellPrice", "sellTotal");
+        
+        // Toggle price field based on order type
+        function togglePriceField(type) {
+            const orderType = document.getElementById(type + 'OrderType').value;
+            const priceField = document.getElementById(type + 'Price');
+            const priceLabel = priceField.closest('.mb-3').querySelector('.form-label');
+            
+            if (orderType === 'market') {
+                priceField.value = '198.89';
+                priceField.readOnly = true;
+                priceLabel.textContent = 'Market Price';
+            } else if (orderType === 'limit') {
+                priceField.readOnly = false;
+                priceLabel.textContent = 'Limit Price';
+            } else if (orderType === 'stop') {
+                priceField.readOnly = false;
+                priceLabel.textContent = 'Stop Price';
+            }
+            
+            calculateTotal(type);
+        }
+    </script>
+</body>
+</html>

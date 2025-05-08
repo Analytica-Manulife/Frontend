@@ -1,0 +1,70 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Login / Signup";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="card-title text-center">@(@Model.IsLogin ? "Login" : "Sign Up")</h3>
+
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger">@Model.ErrorMessage</div>
+                    }
+
+                    <form method="post" id="authForm">
+                        <input type="hidden" asp-for="IsLogin" id="IsLoginField"/>
+
+                        @if (!Model.IsLogin)
+                        {
+                            <div class="mb-3">
+                                <label asp-for="Name" class="form-label">Name</label>
+                                <input asp-for="Name" class="form-control"/>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input asp-for="Password" type="password" class="form-control"/>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">@(@Model.IsLogin ? "Login" : "Sign Up")</button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a href="javascript:void(0);" id="toggleAuthMode">
+                            @(@Model.IsLogin ? "Don't have an account? Sign Up" : "Already have an account? Login")
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const isLoginInput = document.getElementById("IsLoginField");
+    const toggleLink = document.getElementById("toggleAuthMode");
+
+    toggleLink.addEventListener("click", () => {
+        isLoginInput.value = isLoginInput.value === "True" ? "False" : "True";
+        document.getElementById("authForm").submit(); // re-post form to re-render the page
+    });
+
+    // Store account ID if redirected after login
+    const accountId = "@TempData["AccountId"]";
+    if (accountId) {
+        localStorage.setItem("accountId", accountId);
+    }
+</script>
+}

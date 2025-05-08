@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - Analytica</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/colors.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/marketPage.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/Frontend.styles.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var accountId = HttpContextAccessor.HttpContext.Session.GetString("AccountId");
+    var name = HttpContextAccessor.HttpContext.Session.GetString("Name");
+}
+
+<header class="shadow-sm">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="/NewsPage">
+                <i class="fas fa-chart-line me-2"></i>
+                <span>Analytica</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["page"]?.ToString() == "/NewsPage" ? "active" : "")" asp-area="" asp-page="/NewsPage">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-page="/MarketWatch">
+                            <i class="fas fa-chart-bar me-1"></i> Market Watch
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(!string.IsNullOrEmpty(accountId) ? "" : "disabled")" asp-area="" asp-page="/Budget">
+                            <i class="fas fa-wallet me-1"></i> Budget
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    @if (!string.IsNullOrEmpty(accountId))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="avatar-img" viewBox="0 0 24 24" fill="currentColor" alt="Profile">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                                <span class="ms-2 d-none d-lg-inline">@(name)</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-page="/Profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" asp-page="/Settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="/Logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-primary login-btn" asp-area="" asp-page="/Login">
+                                <i class="fas fa-sign-in-alt me-1"></i> Login
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container main-container">
+    <main role="main">
+        @RenderBody()
+    </main>
+</div>
+
+@* <footer class="footer mt-auto"> *@
+@*     <div class="container"> *@
+@*         <div class="row"> *@
+@*             <div class="col-md-4"> *@
+@*                 <h5 class="footer-heading"><i class="fas fa-chart-line me-2"></i>Analytica</h5> *@
+@*                 <p class="footer-text">Simplifying financial analysis for better decisions.</p> *@
+@*             </div> *@
+@*             <div class="col-md-4"> *@
+@*                 <h5 class="footer-heading">Quick Links</h5> *@
+@*                 <ul class="footer-links"> *@
+@*                     <li><a href="#">About Us</a></li> *@
+@*                     <li><a href="#">Contact</a></li> *@
+@*                     <li><a href="#">Privacy Policy</a></li> *@
+@*                 </ul> *@
+@*             </div> *@
+@*             <div class="col-md-4"> *@
+@*                 <h5 class="footer-heading">Connect With Us</h5> *@
+@*                 <div class="social-icons"> *@
+@*                     <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a> *@
+@*                     <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a> *@
+@*                     <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a> *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+@*         <div class="row mt-3"> *@
+@*             <div class="col text-center"> *@
+@*                 <p class="copyright">&copy; 2025 - Analytica. All rights reserved.</p> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </footer> *@
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
+<script>
+    // Check if AccountId exists in TempData (managed on client-side using JavaScript)
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const isLoginPage = currentPath.includes('/Login') || currentPath.includes('/Register');
+        
+        // Only redirect if not on login/register pages
+        if (!isLoginPage) {
+            const account = accountId;
+           console.log(account);
+            if (!account) {
+                window.location.href = '/Login';
+            }
+        }
+    });
+</script>
+</body>
+</html>

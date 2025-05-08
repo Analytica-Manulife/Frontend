@@ -1,0 +1,188 @@
+@page
+@model Frontend.Pages.NewsModel
+@{
+    ViewData["Title"] = "Finance News";
+}
+
+<div class="news-page">
+    <div class="row align-items-center mb-4">
+        <div class="col-lg-6">
+            <h1 class="news-title">
+                <i class="fas fa-newspaper me-2"></i>Finance News
+            </h1>
+        </div>
+        <div class="col-lg-6">
+            <form method="get" class="news-search-form">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="Search" value="@Model.Search" placeholder="Search for news..." aria-label="Search news">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* @if (!string.IsNullOrEmpty(Model.Search)) *@
+    @* { *@
+    @*     <div class="search-results-header mb-4"> *@
+    @*         <h4>Search results for: <span class="search-query">"@Model.Search"</span></h4> *@
+    @*         <a href="/News" class="btn btn-sm btn-outline-primary"> *@
+    @*             <i class="fas fa-times me-1"></i>Clear search *@
+    @*         </a> *@
+    @*     </div> *@
+    @* } *@
+
+    @if (Model.Articles == null || Model.Articles.Count == 0)
+    {
+        <div class="no-results">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-search fa-3x mb-3 text-secondary"></i>
+                    <h4>No news articles found</h4>
+                    <p class="text-muted">Try adjusting your search or check back later for updates.</p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="featured-news mb-5">
+            <h3 class="section-title">
+                <i class="fas fa-star me-2"></i>Featured News
+            </h3>
+            
+            <div class="featured-article">
+                <div class="card">
+                    <div class="row g-0">
+                        <div class="col-md-6">
+                            <div class="featured-image-container">
+                                @if (!string.IsNullOrEmpty(Model.Articles[0].ImageLink))
+                                {
+                                    <img src="@Model.Articles[0].ImageLink" class="img-fluid" alt="@Model.Articles[0].Headline">
+                                }
+                                else
+                                {
+                                    <img src="~/images/news-placeholder.jpg" class="img-fluid" alt="News placeholder">
+                                }
+                                @if (!string.IsNullOrEmpty(Model.Articles[0].Company))
+                                {
+                                    <div class="company-badge">@Model.Articles[0].Company</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card-body">
+                                <h3 class="card-title">@Model.Articles[0].Headline</h3>
+                                <p class="card-text">@Model.Articles[0].Content</p>
+                                <a href="@Model.Articles[0].ArticleLink" target="_blank" class="btn btn-primary">
+                                    <i class="fas fa-book-open me-1"></i>Read Full Article
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="latest-news">
+            <h3 class="section-title">
+                <i class="fas fa-clock me-2"></i>Latest News
+                <div class="carousel-controls">
+                    <button class="prev-btn" id="prevBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="next-btn" id="nextBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </h3>
+
+            <div class="news-carousel-container">
+                <div class="news-carousel" id="newsCarousel">
+                    @for (int i = 1; i < Model.Articles.Count; i++)
+                    {
+                        var article = Model.Articles[i];
+                        <div class="news-card">
+                            <div class="card h-100">
+                                <div class="image-container">
+                                    @if (!string.IsNullOrEmpty(article.ImageLink))
+                                    {
+                                        <img src="@article.ImageLink" class="card-img-top" alt="@article.Headline">
+                                    }
+                                    else
+                                    {
+                                        <img src="~/images/news-placeholder.jpg" class="card-img-top" alt="News placeholder">
+                                    }
+                                    @if (!string.IsNullOrEmpty(article.Company))
+                                    {
+                                        <div class="company-badge">@article.Company</div>
+                                    }
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">@article.Headline</h5>
+                                    <p class="card-text news-summary">@(article.Content.Length > 150 ? article.Content.Substring(0, 150) + "..." : article.Content)</p>
+                                </div>
+                                <div class="card-footer bg-transparent border-0">
+                                    <a href="@article.ArticleLink" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="fas fa-arrow-right me-1"></i>Read More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.getElementById('newsCarousel');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (carousel && prevBtn && nextBtn) {
+                let scrollAmount = 0;
+                const cardWidth = carousel.querySelector('.news-card')?.offsetWidth;
+                const gap = 16; // Gap between cards
+                
+                nextBtn.addEventListener('click', function() {
+                    if (cardWidth) {
+                        const scrollBy = cardWidth + gap;
+                        carousel.scrollBy({ left: scrollBy, behavior: 'smooth' });
+                    }
+                });
+                
+                prevBtn.addEventListener('click', function() {
+                    if (cardWidth) {
+                        const scrollBy = cardWidth + gap;
+                        carousel.scrollBy({ left: -scrollBy, behavior: 'smooth' });
+                    }
+                });
+                
+                // Check if we need to show/hide buttons
+                carousel.addEventListener('scroll', function() {
+                    const maxScrollLeft = carousel.scrollWidth - carousel.clientWidth;
+                    
+                    if (carousel.scrollLeft <= 10) {
+                        prevBtn.classList.add('disabled');
+                    } else {
+                        prevBtn.classList.remove('disabled');
+                    }
+                    
+                    if (Math.abs(carousel.scrollLeft - maxScrollLeft) < 10) {
+                        nextBtn.classList.add('disabled');
+                    } else {
+                        nextBtn.classList.remove('disabled');
+                    }
+                });
+                
+                // Trigger scroll event to set initial button states
+                carousel.dispatchEvent(new Event('scroll'));
+            }
+        });
+    </script>
+}

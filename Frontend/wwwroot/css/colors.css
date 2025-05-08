@@ -1,0 +1,42 @@
+:root {
+    /* Primary color palette - inspired by Manulife but lighter */
+    --primary-color: #076C53;
+    --primary-light: #A0DAC7;
+    --primary-lightest: #E4F5F0;
+
+    /* Secondary color palette */
+    --secondary-color: #4E9D2D;
+    --secondary-light: #B3E092;
+    --secondary-lightest: #E9F7E2;
+
+    /* Accent colors */
+    --accent-color: #FF8C42;
+    --accent-light: #FFBE99;
+
+    /* Neutral colors */
+    --text-color: #2E3A59;
+    --text-secondary: #606D87;
+    --text-tertiary: #8E9CB0;
+    --border-color: #E1E6ED;
+    --background-color: #FFFFFF;
+    --background-light: #F5F7FA;
+
+    /* Component colors */
+    --navbar-bg: #FFFFFF;
+    --navbar-text: var(--primary-color);
+    --navbar-active: var(--primary-color);
+    --card-bg: #FFFFFF;
+    --footer-bg: var(--primary-lightest);
+
+    /* Status colors */
+    --success: #24A148;
+    --error: #DA1E28;
+    --warning: #F1C21B;
+    --info: #0072CE;
+}
+
+body {
+    background-color: var(--background-light);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+}
