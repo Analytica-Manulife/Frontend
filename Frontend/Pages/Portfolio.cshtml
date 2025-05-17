@@ -181,6 +181,12 @@
                 </form>
             </div>
         </div>
+        @if (!string.IsNullOrEmpty(Model.StockSuggestion))
+        {
+            <div class="alert alert-info">
+                Suggested stock to consider: @Model.StockSuggestion
+            </div>
+        }
         <div class="row">
             <!-- Portfolio Summary -->
             <!-- Portfolio Summary -->
@@ -289,7 +295,7 @@
                                 <td>@transaction.TransactionDate.ToString("MMM dd, hh:mm tt")</td>
                                 <td><span class="badge bg-success">Success</span></td>
                                 <td>$@transaction.Amount.ToString("N2")</td>
-                                <td>$@transaction.Quantity</td>
+                                <td>@transaction.Quantity</td>
 
                             </tr>
                         }

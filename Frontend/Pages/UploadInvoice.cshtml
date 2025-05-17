@@ -1,0 +1,243 @@
+@page
+@using BudgetService.Enum
+@model UploadInvoiceModel
+@{
+    ViewData["Title"] = "Upload Invoice";
+}
+    <style>
+        :root {
+            --primary-color: #0a6e4e;
+            --secondary-color: #e9f5f1;
+            --accent-color: #0a6e4e;
+            --text-color: #333;
+            --light-text: #6c757d;
+            --border-color: #dee2e6;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .navbar-brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .search-form {
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .search-input {
+            border-radius: 4px 0 0 4px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .search-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: white;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: var(--secondary-color);
+        }
+        
+        .loading-spinner {
+            margin: 20px auto;
+            color: var(--primary-color);
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #085940;
+            border-color: #085940;
+        }
+        
+        .btn-success {
+            background-color: #198754;
+            border-color: #198754;
+        }
+        
+        .table-primary {
+            background-color: var(--secondary-color);
+        }
+        
+        .table-primary td {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .badge-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+        
+        .invoice-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+    </style>
+<h2>Upload Invoice Image</h2>
+
+<form id="upload-form" method="post" enctype="multipart/form-data">
+    <div id="upload-section">
+        <div class="upload-area" id="drop-area">
+            <div class="invoice-icon">
+                <i class="fas fa-file-invoice fa-3x"></i>
+            </div>
+            <h4>Upload Invoice</h4>
+            <p class="text-muted">Drag and drop your invoice file here or click the button</p>
+
+            <!-- Hidden file input bound to model -->
+            <input asp-for="InvoiceFile" type="file" id="file-input" class="hidden" accept=".pdf,.jpg,.jpeg,.png" />
+            <span asp-validation-for="InvoiceFile" class="text-danger"></span>
+
+            <!-- Single Button -->
+            <button type="button" class="btn btn-primary" id="upload-button">
+                <i class="fas fa-folder-open me-2"></i>Browse & Upload
+            </button>
+        </div>
+
+        <div class="mt-3">
+            <div class="progress hidden" id="upload-progress" style="height: 10px;">
+                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@if (Model.ParsedInvoiceResponse != null && Model.ParsedInvoiceResponse.ParsedFields != null && Model.ParsedInvoiceResponse.ParsedFields.Any())
+{
+    <h3>Parsed Invoice</h3>
+    <img src="@Model.ParsedInvoiceResponse.InvoiceUrl" alt="Invoice Image" />
+    <table class="table">
+        <thead>
+        </thead>
+        <tbody>
+        @foreach (var field in Model.ParsedInvoiceResponse.ParsedFields)
+        {
+            <ul>
+                @foreach (var item in field.Items)
+                {
+                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                        <div class="d-flex align-items-center">
+                            
+                            <i class="@Model.GetTransactionIcon(TransactionType.Utilities) me-3 fs-4 text-secondary"></i>
+                            <i class="@Model.GetTransactionIcon(TransactionType.Utilities) me-3 fs-4 text-secondary"></i>
+
+                            <div>
+                                <div class="fw-semibold">@item.Description</div>
+                                <small class="text-muted">@item.Date</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold">@item.Amount.ToString("C")</span>
+                        </div>
+                    </div>
+
+                }
+            </ul>
+        }
+
+        </tbody>
+    </table>
+}
+<script>
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('file-input');
+    const uploadButton = document.getElementById('upload-button');
+    const form = document.getElementById('upload-form');
+
+    // Trigger file dialog on button click
+    uploadButton.addEventListener('click', () => fileInput.click());
+
+    // Auto-submit form on file select
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            form.submit();
+        }
+    });
+
+    // Drag-and-drop support
+    dropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropArea.classList.add('border-primary');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.classList.remove('border-primary');
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropArea.classList.remove('border-primary');
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+    });
+</script>
+
+

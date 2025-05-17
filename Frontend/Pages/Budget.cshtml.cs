@@ -1,4 +1,5 @@
 using BudgetService.Data;
+using BudgetService.Enum;
 using BudgetService.Properties.Data;
 using Frontend.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -10,17 +11,20 @@ public class BudgetModel : PageModel
 {
     private readonly BudgetApiService _api;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly InvoiceApiService _invoiceApi;
 
-    public BudgetModel(BudgetApiService api, IHttpContextAccessor httpContextAccessor)
+    public BudgetModel(BudgetApiService api, IHttpContextAccessor httpContextAccessor, InvoiceApiService invoiceApi)
     {
         _api = api;
         _httpContextAccessor = httpContextAccessor;
+        _invoiceApi = invoiceApi;
 
     }
 
     public string? Status { get; set; }
     public Budget? Budget { get; set; }
     public Budget? GeneratedBudget { get; set; }
+    public string? Story { get; set; }
 
     public List<Transaction>? Transactions { get; set; }
 
@@ -112,6 +116,50 @@ public class BudgetModel : PageModel
 
         await _api.CreateBudgetAsync(accountId, customBudget);
         Budget = await _api.GetBudgetAsync(accountId);
+        return Page();
+    }
+    public string GetTransactionIcon(TransactionType type)
+    {
+        return type switch
+        {
+            TransactionType.Entertainment => "bi bi-controller",
+            TransactionType.Education => "bi bi-journal-bookmark",
+            TransactionType.Investment => "bi bi-graph-up",
+            TransactionType.DailyNeeds => "bi bi-basket",
+            TransactionType.Housing => "bi bi-house-door",
+            TransactionType.Utilities => "bi bi-lightning",
+            TransactionType.Transportation => "bi bi-truck",
+            TransactionType.Healthcare => "bi bi-heart-pulse",
+            TransactionType.Savings => "bi bi-piggy-bank",
+            TransactionType.Travel => "bi bi-airplane",
+            _ => "bi bi-receipt"
+        };
+    }
+    public async Task<IActionResult> OnPostGenerateStoryAsync()
+    {
+        var accountId = _httpContextAccessor.HttpContext?.Session.GetString("AccountId");
+
+        if (string.IsNullOrEmpty(accountId))
+        {
+            Story = "Account ID not found in session.";
+            return Page();
+        }
+
+        Transactions = await _api.GetTransactionsAsync(accountId);
+
+        if (Transactions == null || Transactions.Count == 0)
+        {
+            Story = "No transactions available to generate a story.";
+            return Page();
+        }
+
+        var storyResponse = await _invoiceApi.GenerateWeeklyStoryAsync(Transactions);
+
+        Story = storyResponse?.Story ?? "Failed to generate story.";
+
+        // Keep everything else updated
+        Budget = await _api.GetBudgetAsync(accountId);
+
         return Page();
     }
 

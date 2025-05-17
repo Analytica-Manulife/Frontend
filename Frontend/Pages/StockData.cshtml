@@ -305,6 +305,15 @@
                 <button class="nav-link" id="sell-tab" data-bs-toggle="tab" data-bs-target="#sell" type="button" role="tab" aria-controls="sell" aria-selected="false">Sell</button>
             </li>
         </ul>
+        
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            var alertType = Model.Message.Contains("successful") ? "success" : "danger";
+            <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                @Model.Message
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
         <div class="tab-content" id="tradeTabContent">
             <!-- Buy Tab -->
@@ -469,6 +478,13 @@
             
             calculateTotal(type);
         }
+        setTimeout(function () {
+            let alert = document.querySelector('.alert');
+            if (alert) {
+                let bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        }, 5000);
     </script>
 </body>
 </html>

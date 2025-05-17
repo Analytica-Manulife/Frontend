@@ -77,10 +77,15 @@ public class BudgetApiService
 
     public async Task<bool> CreateTransactionAsync(string account_id,Transaction txn)
     {
+        Console.WriteLine("Creating transections for"+ account_id);
+        var json = JsonSerializer.Serialize(txn);
+        Console.Write("Json"+json);
         var result = await _httpClient.PostAsJsonAsync($"{_baseUrl}/transection/Transaction/create", txn);
         Console.WriteLine(result.ToString());
         Console.WriteLine($"{_baseUrl}/transection/Transaction/create");
         Console.WriteLine(result.Content.ToString());
+        Console.WriteLine(result.ReasonPhrase);
+
         return result.IsSuccessStatusCode;
          }
 }

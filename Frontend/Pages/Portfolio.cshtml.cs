@@ -12,18 +12,21 @@ public class PortfolioModel : PageModel
     private readonly PortfolioService _portfolioService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly StockService _stockService;
+    private readonly StockSuggestionService _stockSuggestionService;
 
-    public PortfolioModel(PortfolioService portfolioService,IHttpContextAccessor httpContextAccessor,StockService stockService)
+    public PortfolioModel(PortfolioService portfolioService,IHttpContextAccessor httpContextAccessor,StockService stockService, StockSuggestionService stockSuggestionService)
     {
         _portfolioService = portfolioService;
         _httpContextAccessor = httpContextAccessor;
         _stockService = stockService;
+        _stockSuggestionService = stockSuggestionService;
 
     }
 
     [BindProperty(SupportsGet = true)]
     public string AccountId { get; set; }
     public List<Stock> Stocks { get; set; } = new();
+    public string? StockSuggestion { get; set; }
 
     public List<Portfolio> PortfolioList { get; set; }
     public List<StockTransaction> TransactionList { get; set; }
@@ -43,6 +46,9 @@ public class PortfolioModel : PageModel
         {
             PortfolioList = await _portfolioService.GetPortfolioAsync(accountIdStr);
             TransactionList = await _portfolioService.GetTransactionsAsync(accountIdStr);
+            
+            StockSuggestion = await _stockSuggestionService.GetStockSuggestionAsync(PortfolioList, Stocks);
+
         }
     }
     private void SetAccountId()

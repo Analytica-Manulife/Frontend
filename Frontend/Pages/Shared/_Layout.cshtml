@@ -53,6 +53,11 @@
                             <i class="fas fa-wallet me-1"></i> Portfolio
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-page="/UploadInvoice">
+                            <i class="fas fa-chart-bar me-1"></i> Invoice
+                        </a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     @if (!string.IsNullOrEmpty(accountId))
@@ -65,8 +70,8 @@
                                 <span class="ms-2 d-none d-lg-inline">@(name)</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-page="/Profile"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item" asp-page="/Settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                                @* <li><a class="dropdown-item" asp-page="/Profile"><i class="fas fa-user me-2"></i>Profile</a></li> *@
+                                @* <li><a class="dropdown-item" asp-page="/Settings"><i class="fas fa-cog me-2"></i>Settings</a></li> *@
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" asp-page="/Logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                             </ul>

@@ -1,5 +1,7 @@
 @page
 @using System.Text.Json
+@using BudgetService.Enum
+@using Pages.Shared
 @model BudgetModel
 
 @{
@@ -165,13 +167,13 @@
                     <a class="nav-link" href="#transactions">Transactions</a>
                 </li>
             </ul>
-            <div class="d-flex align-items-center ms-3">
-                <span class="me-2">Account ID:</span>
-                <span id="accountIdDisplay">Not Set</span>
-                <button class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#accountModal">
-                    Change
-                </button>
-            </div>
+            @* <div class="d-flex align-items-center ms-3"> *@
+            @*     <span class="me-2">Account ID:</span> *@
+            @*     <span id="accountIdDisplay">Not Set</span> *@
+            @*     <button class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#accountModal"> *@
+            @*         Change *@
+            @*     </button> *@
+            @* </div> *@
         </div>
     </div>
 </nav>
@@ -246,40 +248,141 @@
             @*         </div> *@
             @*     </div> *@
             @* </div> *@
+            <form method="post">
+                <button type="submit" asp-page-handler="GenerateStory" class="btn btn-primary">Generate Weekly Story</button>
+            </form>
+
+            @if (Model.Story != null)
+            {
+                <div class="alert alert-info mt-3">
+                    <strong>Story:</strong> @Model.Story
+                </div>
+            }
 
         </div>
 
         <div class="row mt-4">
             <!-- Budget Distribution Chart -->
             <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Budget Distribution</span>
-                        <div class="spinner-border spinner-border-sm text-primary loading-spinner" id="chartLoading" role="status">
-                          @if (Model.Budget != null)
-{
-    <div class="card mt-4">
-        <div class="card-header">Budget Chart</div>
-        <div class="card-body">
-            <canvas id="budgetChart" width="400" height="400"></canvas>
-        </div>
-    </div>
+                <div class="row">
+                    <!-- Circular Chart -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                Budget Distribution
+                            </div>
+                            <div class="card-body">
+                                @if (Model.Budget != null)
+                                {
+                                    <canvas id="circularChart" width="300" height="300"></canvas>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">No budget data available.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Spider Chart -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                Spending Chart
+                            </div>
+                            <div class="card-body">
+                                @if (Model.Budget != null)
+                                {
+                                    <canvas id="radarChart" width="300" height="300"></canvas>
+                                }
+                                else
+                                {
+                                    <p class="text-muted">No budget data available.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+</div>
+
+@if (Model.Budget != null)
+{
     <script>
-        
+        document.addEventListener("DOMContentLoaded", function () {
+            const labels = [
+                "Entertainment", "Education", "Investment", "Daily Needs", "Housing",
+                "Utilities", "Transportation", "Healthcare", "Savings Goal", "Travel"
+            ];
+
+            const data = [
+                @Model.Budget.EntertainmentBudget,
+                @Model.Budget.EducationBudget,
+                @Model.Budget.InvestmentBudget,
+                @Model.Budget.DailyNeedsBudget,
+                @Model.Budget.HousingBudget,
+                @Model.Budget.UtilitiesBudget,
+                @Model.Budget.TransportationBudget,
+                @Model.Budget.HealthcareBudget,
+                @Model.Budget.SavingsGoal,
+                @Model.Budget.TravelBudget
+            ];
+
+            // Circular Chart
+            new Chart(document.getElementById('circularChart'), {
+                type: 'doughnut', // or 'pie'
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF",
+                            "#FF9F40", "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Radar Chart
+            new Chart(document.getElementById('radarChart'), {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Budget Categories',
+                        data: data,
+                        fill: true,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
     </script>
 }
 
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="budgetDistributionChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
                 
             <!-- Recent Transactions -->
             <div class="col-md-4">
+                
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Recent Transactions</span>
@@ -289,21 +392,32 @@
                     </div>
                     <div class="card-body p-0">
                         <div id="recentTransactions" class="p-3">
-                            
                             @if (Model.Transactions != null && Model.Transactions.Any())
                             {
                                 @foreach (var txn in Model.Transactions.Take(5))
                                 {
-                                    <div>@txn.Details - @txn.Amount</div>
+                                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                        <div class="d-flex align-items-center">
+                                            @{
+                                                var typeEnum = Enum.TryParse<TransactionType>(txn.TransactionType, out var parsedType) ? parsedType : TransactionType.DailyNeeds;
+                                            }
+                                            <i class="@GetTransactionIcon(typeEnum) me-3 fs-4 text-secondary"></i>
+
+                                            <div>
+                                                <div class="fw-semibold">@txn.Details</div>
+                                                <small class="text-muted">@txn.TransactionDate.ToString("MMM dd, yyyy")</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="fw-bold">@txn.Amount.ToString("C")</span>
+                                        </div>
+                                    </div>
                                 }
                             }
                             else
                             {
                                 <div>No recent transactions found.</div>
                             }
-
-                            
-                            
                         </div>
                     </div>
                     <div class="card-footer text-center">
@@ -311,26 +425,189 @@
                     </div>
                 </div>
             </div>
+            @functions {
+                public string GetTransactionIcon(TransactionType type)
+                {
+                    return type switch
+                    {
+                        TransactionType.Entertainment => "bi bi-controller",
+                        TransactionType.Education => "bi bi-journal-bookmark",
+                        TransactionType.Investment => "bi bi-graph-up",
+                        TransactionType.DailyNeeds => "bi bi-basket",
+                        TransactionType.Housing => "bi bi-house-door",
+                        TransactionType.Utilities => "bi bi-lightning",
+                        TransactionType.Transportation => "bi bi-truck",
+                        TransactionType.Healthcare => "bi bi-heart-pulse",
+                        TransactionType.Savings => "bi bi-piggy-bank",
+                        TransactionType.Travel => "bi bi-airplane",
+                        _ => "bi bi-receipt"
+                    };
+                }
+            }
+
         </div>
 
-        <div class="row mt-4">
-            <!-- Spending Trend Chart -->
-            <div class="col-md-12">
+    @*     <div class="row mt-4"> *@
+    @*         <!-- Spending Trend Chart --> *@
+    @*         <div class="col-md-12"> *@
+    @*             <div class="card"> *@
+    @*                 <div class="card-header d-flex justify-content-between align-items-center"> *@
+    @*                     <span>Spending Trend</span> *@
+    @*                      *@
+    @*                 </div> *@
+    @*                 <div class="card-body"> *@
+    @*                     <canvas id="spendingTrendChart" height="200"></canvas> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @*         </div> *@
+    @*     </div> *@
+    @*     @if (Model.Budget != null) { *@
+    @*         <script> *@
+    @*     const transactions = @Html.Raw(Json.Serialize(Model.Transactions)); *@
+    @* *@
+    @*     const dailySpending = {}; *@
+    @* *@
+    @*     transactions.forEach(t => { *@
+    @*         const date = new Date(t.TransactionDate).toISOString().split('T')[0]; *@
+    @*         const amount = parseFloat(t.Amount); *@
+    @* *@
+    @*         // Assuming only "debit"/spending transactions *@
+    @*         if (t.transactionType.toLowerCase() === "debit") { *@
+    @*             if (!dailySpending[date]) { *@
+    @*                 dailySpending[date] = 0; *@
+    @*             } *@
+    @*             dailySpending[date] += amount; *@
+    @*         } *@
+    @*     }); *@
+    @* *@
+    @*     const labels = Object.keys(dailySpending).sort(); *@
+    @*     const dataPoints = labels.map(label => dailySpending[label]); *@
+    @* *@
+    @*     const ctx = document.getElementById('spendingTrendChart').getContext('2d'); *@
+    @*     new Chart(ctx, { *@
+    @*         type: 'line', *@
+    @*         data: { *@
+    @*             labels: labels, *@
+    @*             datasets: [{ *@
+    @*                 label: 'Daily Spending ($)', *@
+    @*                 data: dataPoints, *@
+    @*                 borderColor: 'rgba(75, 192, 192, 1)', *@
+    @*                 backgroundColor: 'rgba(75, 192, 192, 0.2)', *@
+    @*                 fill: true, *@
+    @*                 tension: 0.3, *@
+    @*                 pointRadius: 3 *@
+    @*             }] *@
+    @*         }, *@
+    @*         options: { *@
+    @*             responsive: true, *@
+    @*             scales: { *@
+    @*                 y: { *@
+    @*                     beginAtZero: true *@
+    @*                 } *@
+    @*             } *@
+    @*         } *@
+    @*     }); *@
+    @* </script> *@
+    @*     } *@
+
+        
+    </section>
+   <!-- Transactions Section -->
+    <section id="transactions" class="mb-5">
+        <h2 class="mb-4">Transactions</h2>
+            
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Add New Transaction</div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="AddTransaction">
+                            <div class="mb-3">
+                                <label for="transactionType" class="form-label">Transaction Type</label>
+                                <select class="form-select" id="transactionType" name="transactionType" required>
+                                    <option value="">Select type</option>
+                                    <option value="INCOME">Income</option>
+                                    <option value="ENTERTAINMENT">Entertainment</option>
+                                    <option value="EDUCATION">Education</option>
+                                    <option value="INVESTMENT">Investment</option>
+                                    <option value="DAILY_NEEDS">Daily Needs</option>
+                                    <option value="HOUSING">Housing</option>
+                                    <option value="UTILITIES">Utilities</option>
+                                    <option value="TRANSPORTATION">Transportation</option>
+                                    <option value="HEALTHCARE">Healthcare</option>
+                                    <option value="SAVINGS">Savings</option>
+                                    <option value="TRAVEL">Travel</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="details" class="form-label">Details</label>
+                                <input type="text" class="form-control" id="details" name="details" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Add Transaction
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+                
+            <div class="col-md-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Spending Trend</span>
-                        <div class="spinner-border spinner-border-sm text-primary loading-spinner" id="trendLoading" role="status">
+                        <span>Transaction History</span>
+                        <div class="spinner-border spinner-border-sm text-primary loading-spinner" id="transactionHistoryLoading" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <canvas id="spendingTrendChart" height="250"></canvas>
+                    <div class="card-body p-0">
+                        <div id="transactionHistory" class="p-3">
+                            @if (Model.Transactions != null && Model.Transactions.Any())
+                            {
+                                @foreach (var txn in Model.Transactions.Take(5))
+                                {
+                                    <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                        <div class="d-flex align-items-center">
+                                            @{
+                                                var typeEnum = Enum.TryParse<TransactionType>(txn.TransactionType, out var parsedType) ? parsedType : TransactionType.DailyNeeds;
+                                            }
+                                            <i class="@GetTransactionIcon(typeEnum) me-3 fs-4 text-secondary"></i>
+                                            <i class="@GetTransactionIcon(typeEnum) me-3 fs-4 text-secondary"></i>
+
+                                            <div>
+                                                <div class="fw-semibold">@txn.Details</div>
+                                                <small
+                                                    class="text-muted">@txn.TransactionDate.ToString("MMM dd, yyyy")</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="fw-bold">@txn.Amount.ToString("C")</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div>No recent transactions found.</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary w-100" id="getTransactionsBtn">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh Transactions
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
     <!-- Budget Management Section -->
    <section id="budget" class="mb-5">
     <h2 class="mb-4">Budget Management</h2>
@@ -506,85 +783,7 @@
     </div>
 </section>
 
-    <!-- Transactions Section -->
-    <section id="transactions" class="mb-5">
-        <h2 class="mb-4">Transactions</h2>
-            
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">Add New Transaction</div>
-                    <div class="card-body">
-                        <form method="post" asp-page-handler="AddTransaction">
-                            <div class="mb-3">
-                                <label for="transactionType" class="form-label">Transaction Type</label>
-                                <select class="form-select" id="transactionType" name="transactionType" required>
-                                    <option value="">Select type</option>
-                                    <option value="INCOME">Income</option>
-                                    <option value="ENTERTAINMENT">Entertainment</option>
-                                    <option value="EDUCATION">Education</option>
-                                    <option value="INVESTMENT">Investment</option>
-                                    <option value="DAILY_NEEDS">Daily Needs</option>
-                                    <option value="HOUSING">Housing</option>
-                                    <option value="UTILITIES">Utilities</option>
-                                    <option value="TRANSPORTATION">Transportation</option>
-                                    <option value="HEALTHCARE">Healthcare</option>
-                                    <option value="SAVINGS">Savings</option>
-                                    <option value="TRAVEL">Travel</option>
-                                    <option value="OTHER">Other</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="amount" class="form-label">Amount</label>
-                                <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="details" class="form-label">Details</label>
-                                <input type="text" class="form-control" id="details" name="details" required>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus me-2"></i>Add Transaction
-                                </button>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-                
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Transaction History</span>
-                        <div class="spinner-border spinner-border-sm text-primary loading-spinner" id="transactionHistoryLoading" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div id="transactionHistory" class="p-3">
-                            @if (Model.Transactions != null && Model.Transactions.Any())
-                            {
-                                @foreach (var txn in Model.Transactions.Take(5))
-                                {
-                                    <div>@txn.Details - @txn.Amount</div>
-                                }
-                            }
-                            else
-                            {
-                                <div>No recent transactions found.</div>
-                            }
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-primary w-100" id="getTransactionsBtn">
-                            <i class="fas fa-sync-alt me-2"></i>Refresh Transactions
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+ 
 </div>
 
 <!-- Footer -->
@@ -631,53 +830,6 @@
             }
         });
         const ctx = document.getElementById('budgetChart').getContext('2d');
-        const budgetChart = new Chart(ctx, {
-            type: 'bar', // or 'pie' if preferred
-            data: {
-                labels: [
-                    'Entertainment', 'Education', 'Investment', 'Daily Needs',
-                    'Housing', 'Utilities', 'Transportation', 'Healthcare',
-                    'Savings Goal', 'Travel'
-                ],
-                datasets: [{
-                    label: 'Budget ($)',
-                    data: [
-                        @Model.Budget.EntertainmentBudget,
-                        @Model.Budget.EducationBudget,
-                        @Model.Budget.InvestmentBudget,
-                        @Model.Budget.DailyNeedsBudget,
-                        @Model.Budget.HousingBudget,
-                        @Model.Budget.UtilitiesBudget,
-                        @Model.Budget.TransportationBudget,
-                        @Model.Budget.HealthcareBudget,
-                        @Model.Budget.SavingsGoal,
-                        @Model.Budget.TravelBudget
-                    ],
-                    backgroundColor: [
-                        '#4dc9f6', '#f67019', '#f53794', '#537bc4',
-                        '#acc236', '#166a8f', '#00a950', '#58595b',
-                        '#8549ba', '#ffcc00'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    title: {
-                        display: true,
-                        text: 'Custom Budget Distribution'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        }); 
+
     </script>
 }

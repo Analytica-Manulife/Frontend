@@ -9,6 +9,8 @@ builder.Services.AddSingleton<NewsService>();
 builder.Services.AddSingleton<StockService>();
 builder.Services.AddSingleton<PortfolioService>();
 builder.Services.AddSingleton<BudgetApiService>();
+builder.Services.AddSingleton<InvoiceApiService>();
+builder.Services.AddHttpClient<StockSuggestionService>();
 
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<YahooFinanceService>();
@@ -36,7 +38,7 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.UseSession();
 
-// Inside Configure method in Startup.cs or similar method in Program.cs
+// Inside Configure method in Startup.cs or similar method in Program.csr
 app.UseMiddleware<AuthenticationCheckMiddleware>();
 
 app.MapGet("/", context =>
